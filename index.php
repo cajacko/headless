@@ -3,8 +3,9 @@
 $response = array();
 $date_format = 'Y-m-d H:i:s';
 
+$taxonomies = get_taxonomies();
+
 if (have_posts()) {
-    // Start the loop.
     while (have_posts()) {
         the_post();
 
@@ -48,44 +49,68 @@ if (have_posts()) {
 
         $post_array['format'] = get_post_format() ? : 'standard';
 
+        $post_thumbnail_id = get_post_thumbnail_id();
+
+        if ($post_thumbnail_id && '' != $post_thumbnail_id) {
+            if ($post_thumbnail_info = headless_return_media_info($post_thumbnail_id)) {
+                $post_array['featuredMedia'] = $post_thumbnail_info;
+            }
+        }
+
+        $attached_media = get_attached_media('');
+
+        if ($attached_media && count($attached_media)) {
+            $media_array = array();
+
+            foreach ($attached_media as $media) {
+                if (strpos($media->post_mime_type, 'image') !== false) {
+                    if ($media = headless_return_media_info($media->ID)) {
+                        $media_array[] = $media;
+                    }
+                }
+            }
+
+            if (count($media_array)) {
+                $post_array['attachedMedia'] = $media_array;
+            }
+        }
+
+        if (is_sticky()) {
+            $post_array['sticky'] = true;
+        }
+
+        $terms = headless_get_post_terms($post->ID, $taxonomies);
+
+        if ($terms && count($terms)) {
+            $post_array['terms'] = $terms;
+        }
+
+        $meta = get_post_meta($post_id);
+
+        if ($meta && count($meta)) {
+            $post_array['meta'] = $meta;
+        }
 
         $response[] = $post_array;
-
-        // twentyfifteen_post_thumbnail();
-
-        // wp_link_pages(array(
-        //     'before'      => '<div class="page-links"><span class="page-links-title">' . __('Pages:', 'twentyfifteen') . '</span>',
-        //     'after'       => '</div>',
-        //     'link_before' => '<span>',
-        //     'link_after'  => '</span>',
-        //     'pagelink'    => '<span class="screen-reader-text">' . __('Page', 'twentyfifteen') . ' </span>%',
-        //     'separator'   => '<span class="screen-reader-text">, </span>',
-        // ));
-
-
-        // _e('Published by', 'twentyfifteen');
-        // $author_bio_avatar_size = apply_filters('twentyfifteen_author_bio_avatar_size', 56);
-
-        // echo get_avatar(get_the_author_meta('user_email'), $author_bio_avatar_size);
-        // echo get_the_author();
-
-        // the_author_meta('description');
-        // echo esc_url(get_author_posts_url(get_the_author_meta('ID')));
-        // printf(__('View all posts by %s', 'twentyfifteen'), get_the_author());
-
-        // twentyfifteen_entry_meta();
     }
 
-    // Previous/next page navigation.
-    // the_posts_pagination(array(
-    //     'prev_text'          => __('Previous page', 'twentyfifteen'),
-    //     'next_text'          => __('Next page', 'twentyfifteen'),
-    //     'before_page_number' => '<span class="meta-nav screen-reader-text">' . __('Page', 'twentyfifteen') . ' </span>',
-    // ));
+    $response['pagination'] = array();
 
-// If no content, include the "No posts found" template.
+    $prev = get_previous_posts_page_link();
+
+    if ($prev && '' != $prev) {
+        $response['pagination']['prev'] = $prev;
+    }
+
+    $next = get_next_posts_page_link();
+
+    if ($next && '' != $next) {
+        $response['pagination']['next'] = $next;
+    }
 } else {
-    // get_template_part('content', 'none');
+    $response = array(
+        'status' => 'no-more-posts',
+    );
 }
 
 echo json_encode($response);

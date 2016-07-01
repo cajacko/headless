@@ -1,23 +1,23 @@
 <?php
 
 // Setup the theme
-function wordpress_theme_setup()
+function headless_setup()
 {
-    wordpress_theme_setup_media();
+    headless_setup_media();
 }
 
-function wordpress_theme_enqueue_js()
+function headless_enqueue_js()
 {
-    wordpress_theme_js();
+    headless_js();
 }
 
-function wordpress_theme_init()
+function headless_init()
 {
-    wordpress_theme_permalinks();
-    wordpress_theme_media_ini();
+    headless_permalinks();
+    headless_media_ini();
 }
 
-function wordpress_theme_template_redirect()
+function headless_template_redirect()
 {
-    wordpress_theme_front_end_http_headers();
+    headless_front_end_http_headers();
 }

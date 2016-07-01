@@ -11,6 +11,7 @@ require_once('functions/javascript-example.php');
 require_once('functions/media.php');
 require_once('functions/permalinks.php');
 require_once('functions/headers.php');
+require_once('functions/terms.php');
 
 // Use functions
 require_once('functions/filters.php');

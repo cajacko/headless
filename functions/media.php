@@ -1,7 +1,7 @@
 <?php
 
 // Setup theme
-function wordpress_theme_setup_media()
+function headless_setup_media()
 {
     add_theme_support('post-thumbnails');
     
@@ -15,11 +15,22 @@ function wordpress_theme_setup_media()
     }
 }
 
-function wordpress_theme_media_ini()
+function headless_media_ini()
 {
     // Set upload size
     @ini_set('upload_max_size', '10G');
     @ini_set('upload_max_filesize', '10G');
     @ini_set('post_max_size', '10G');
     @ini_set('max_execution_time', '300');
+}
+
+function headless_return_media_info($media_id)
+{
+    $array = wp_get_attachment_metadata($media_id);
+
+    if (is_array($array) && count($array)) {
+        $array['ID'] = $media_id;
+    }
+    
+    return $array;
 }
